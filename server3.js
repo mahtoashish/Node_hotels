@@ -2,8 +2,12 @@ const express = require('express')
 const app = express();// app is an instance
 const db = require("./db");
 
+require('dotenv').config();
+
 const bodyParser = require('body-parser');
 app.use(bodyParser.json()); // to support JSON-encoded bodies (req.body)
+const PORT = process.env.PORT || 3000;
+
 const Person = require('./models/person');
 const menu = require('./models/menu');
 
@@ -105,13 +109,13 @@ app.get('/', function (req, res) {
 // });
 
 
-const personRoutes=require('./routes/personRoutes');
-app.use('/person',personRoutes);
+const personRoutes = require('./routes/personRoutes');
+app.use('/person', personRoutes);
 
-const menuRoutes=require('./routes/menuRoutes');
-app.use( '/menu', menuRoutes );
+const menuRoutes = require('./routes/menuRoutes');
+app.use('/menu', menuRoutes);
 
 
-// for testing  purpose only
-
-app.listen(3000, () => { console.log("Listening at port 3000!"); })
+app.listen(PORT, () => {
+  console.log("Listening at port 3000!");
+});
