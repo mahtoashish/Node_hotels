@@ -1,18 +1,28 @@
 const express = require('express')
 const app = express();// app is an instance
 const db = require("./db");
-
 require('dotenv').config();
+const passport = require("./auth");
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.json()); // to support JSON-encoded bodies (req.body)
 const PORT = process.env.PORT || 3000;
 
+//model/schema
 const Person = require('./models/person');
 const menu = require('./models/menu');
 
+// Middleware Functions
+const logRequest = (req, res, next) => {
+  console.log(`[${new Date().toLocaleString()}] Request made to :${req.originalUrl}`);
+  next();//move on to the next phase
+}
 
-app.get('/', function (req, res) {
+app.use(logRequest);
+
+app.use(passport.initialize());
+const localAuthMiddleware=passport.authenticate('local',{session:false});
+app.get('/',localAuthMiddleware, function (req, res) {
   res.send('Welcome to our Hotel')
 })
 
@@ -109,10 +119,13 @@ app.get('/', function (req, res) {
 // });
 
 
-const personRoutes = require('./routes/personRoutes');
-app.use('/person', personRoutes);
 
+// Import of the router files
+const personRoutes = require('./routes/personRoutes');
 const menuRoutes = require('./routes/menuRoutes');
+
+//  use of routers
+app.use('/person',localAuthMiddleware, personRoutes);
 app.use('/menu', menuRoutes);
 
 
